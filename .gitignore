@@ -147,3 +147,9 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Vercel output
+.vercel
+
+# Optional locally hosted model weights (large; keep out of Git)
+public/models/*.onnx
