@@ -1,4 +1,4 @@
-import { type EnvLike, redact } from "./security";
+import { type EnvLike, redact, stripControlChars } from "./security";
 
 /**
  * Minimal client for any OpenAI-compatible Chat Completions endpoint. This covers
@@ -152,6 +152,66 @@ export class ModelClient implements ChatPort {
       }
       return { text, model: typeof data?.model === "string" ? data.model : this.config.model };
     }
+  }
+}
+
+/* --------------------------------------------- connectivity check */
+
+export interface ConnectivityCheckResult {
+  /** True when the endpoint answered; false when the probe itself failed. */
+  ok: boolean;
+  /** True when the model answered the explicit probe with the expected reply. */
+  replyAccepted: boolean;
+  /** Configured model name, redacted and control-stripped. Never raw provider output. */
+  model: string | null;
+  elapsedMs: number;
+  /** Upstream HTTP status when known; callers map failures to 502. */
+  status?: number;
+  /** Redacted failure description. Present only when ok is false. */
+  error?: string;
+}
+
+/** The probe asks for exactly "OK"; punctuation-tolerant but nothing else is accepted. */
+export function isConnectivityReply(text: string): boolean {
+  return /^ok[.!]?$/i.test(text.trim());
+}
+
+/**
+ * Runs one short, explicit connectivity probe against a configured model endpoint.
+ * Never throws and never returns raw model output: only the redacted model name,
+ * latency, and an accept/reject flag. Errors are redacted against known secrets.
+ */
+export async function runConnectivityCheck(
+  model: ChatPort,
+  options: { secrets?: readonly string[]; now?: () => Date } = {},
+): Promise<ConnectivityCheckResult> {
+  const secrets = options.secrets ?? [];
+  const now = options.now ?? (() => new Date());
+  const startedAt = now().getTime();
+  try {
+    const response = await model.chat(
+      [
+        { role: "system", content: "This is a connectivity check. Reply with exactly the two letters OK and nothing else." },
+        { role: "user", content: "Reply OK." },
+      ],
+      { maxTokens: 8, temperature: 0, maxAttempts: 1 },
+    );
+    return {
+      ok: true,
+      replyAccepted: isConnectivityReply(response.text),
+      model: stripControlChars(redact(response.model, secrets)).slice(0, 120),
+      elapsedMs: Math.max(0, now().getTime() - startedAt),
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "The model endpoint could not be reached.";
+    return {
+      ok: false,
+      replyAccepted: false,
+      model: stripControlChars(redact(model.model, secrets)).slice(0, 120),
+      elapsedMs: Math.max(0, now().getTime() - startedAt),
+      status: error instanceof ModelError ? error.status : undefined,
+      error: stripControlChars(redact(message, secrets)).slice(0, 300),
+    };
   }
 }
 

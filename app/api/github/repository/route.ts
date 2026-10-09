@@ -3,7 +3,7 @@ import { z } from "zod";
 import { HttpError, json, readJson, withSession } from "@/lib/api";
 import { parseRepoSlug } from "@/lib/github";
 import { redact, stripControlChars } from "@/lib/security";
-import { REPO_SETTING_KEY } from "@/lib/services";
+import { REPO_SETTING_KEY, isWithinRepositoryLock } from "@/lib/services";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const slug = parseRepoSlug(repository);
     if (!slug) throw new HttpError(400, "Use the owner/name format.");
     const locked = services.config.githubRepository;
-    if (locked && (slug.owner.toLowerCase() !== locked.owner.toLowerCase() || slug.name.toLowerCase() !== locked.name.toLowerCase())) {
+    if (!isWithinRepositoryLock(locked, slug.owner, slug.name)) {
       throw new HttpError(403, "This Agent Studio deployment is locked to the configured repository.");
     }
     const client = services.githubFor(slug.owner, slug.name);

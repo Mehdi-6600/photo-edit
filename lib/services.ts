@@ -24,6 +24,32 @@ import { GATE_PHRASES, TASK_BY_ID, TASK_IDS, type TaskId } from "./workflow";
 
 export const REPO_SETTING_KEY = "settings:github-repository";
 
+export interface RepositoryLockState {
+  locked: boolean;
+  /** Why the repository choice is fixed: environment lock, or fail-closed on a malformed setting. */
+  reason: "environment" | "config-error" | null;
+  repository: { owner: string; name: string } | null;
+}
+
+/** Describes whether this deployment pins the target repository, and why. */
+export function repositoryLockState(
+  config: Pick<StudioConfig, "githubRepository" | "repositoryConfigError">,
+): RepositoryLockState {
+  if (config.githubRepository) return { locked: true, reason: "environment", repository: { ...config.githubRepository } };
+  if (config.repositoryConfigError) return { locked: true, reason: "config-error", repository: null };
+  return { locked: false, reason: null, repository: null };
+}
+
+/** Case-insensitive membership test for the repository lock. An absent lock accepts every repository. */
+export function isWithinRepositoryLock(
+  lock: { owner: string; name: string } | null | undefined,
+  owner: string,
+  name: string,
+): boolean {
+  if (!lock) return true;
+  return owner.toLowerCase() === lock.owner.toLowerCase() && name.toLowerCase() === lock.name.toLowerCase();
+}
+
 export interface StudioConfig {
   accessToken?: string;
   githubToken?: string;
@@ -131,8 +157,7 @@ export function createServices(config: StudioConfig, store: StudioStore, now: ()
     },
     githubFor(owner, name) {
       if (!config.githubToken || config.repositoryConfigError) return null;
-      const lock = config.githubRepository;
-      if (lock && (owner.toLowerCase() !== lock.owner.toLowerCase() || name.toLowerCase() !== lock.name.toLowerCase())) return null;
+      if (!isWithinRepositoryLock(config.githubRepository, owner, name)) return null;
       return new GitHubClient(config.githubToken, owner, name);
     },
     async audit(entry) {
