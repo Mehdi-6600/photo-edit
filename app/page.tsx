@@ -1,5 +1,5 @@
-import { PhotoEditor } from "@/components/photo-editor";
+import { Workspace } from "@/components/workspace";
 
 export default function HomePage() {
-  return <PhotoEditor />;
+  return <Workspace />;
 }
