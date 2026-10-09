@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { ModelClient, ModelError, extractJson, modelConfigFromEnv } from "@/lib/model";
+import {
+  ModelClient,
+  ModelError,
+  extractJson,
+  isConnectivityReply,
+  modelConfigFromEnv,
+  runConnectivityCheck,
+  type ChatMessage,
+  type ChatPort,
+} from "@/lib/model";
 import { analyzeIdea, analyzeIdeaHeuristic, buildClarifiedIdea, detectLanguage, MAX_IDEA_LENGTH } from "@/lib/planner";
 import { TASK_IDS, validateWorkflow, workflowOrder, TASKS, type TaskDef } from "@/lib/workflow";
 
@@ -103,6 +112,73 @@ describe("ModelClient", () => {
       fetchImpl: async () => jsonResponse({ choices: [{ message: { content: "   " } }] }),
     });
     await expect(client.chat([{ role: "user", content: "x" }])).rejects.toThrow(/empty/);
+  });
+});
+
+describe("model connectivity check", () => {
+  const secrets = ["probe-secret-value-123456"];
+
+  it("accepts the explicit OK reply and reports only the model name and latency", async () => {
+    let seen: { messages: ChatMessage[]; maxAttempts?: number } | undefined;
+    const port: ChatPort = {
+      model: "free-model",
+      chat: async (messages, options) => {
+        seen = { messages, maxAttempts: options?.maxAttempts };
+        return { text: "OK", model: "free-model" };
+      },
+    };
+    let time = 1_000_000;
+    const result = await runConnectivityCheck(port, { secrets, now: () => new Date((time += 650)) });
+    expect(result).toEqual({ ok: true, replyAccepted: true, model: "free-model", elapsedMs: 650 });
+    expect(seen?.maxAttempts).toBe(1);
+    expect(seen?.messages.some((message) => message.content.includes("connectivity check"))).toBe(true);
+  });
+
+  it("accepts only the expected reply shape", () => {
+    expect(isConnectivityReply("ok")).toBe(true);
+    expect(isConnectivityReply("  OK! ")).toBe(true);
+    expect(isConnectivityReply("okay")).toBe(false);
+    expect(isConnectivityReply("OK, here is more text")).toBe(false);
+    expect(isConnectivityReply("")).toBe(false);
+  });
+
+  it("flags unexpected replies without returning or storing them", async () => {
+    const port: ChatPort = {
+      model: "free-model",
+      chat: async () => ({ text: "Sure! Here is a very long explanation about everything.", model: "free-model" }),
+    };
+    const result = await runConnectivityCheck(port, { secrets });
+    expect(result.ok).toBe(true);
+    expect(result.replyAccepted).toBe(false);
+    expect(JSON.stringify(result)).not.toContain("explanation");
+  });
+
+  it("returns a redacted failure instead of throwing, keeping the raw error private", async () => {
+    const port: ChatPort = {
+      model: "free-model",
+      chat: async () => {
+        throw new ModelError(`The model returned HTTP 401: key probe-secret-value-123456 was rejected`, 401);
+      },
+    };
+    const result = await runConnectivityCheck(port, { secrets });
+    expect(result.ok).toBe(false);
+    expect(result.replyAccepted).toBe(false);
+    expect(result.status).toBe(401);
+    expect(result.model).toBe("free-model");
+    expect(result.error).toBeDefined();
+    expect(result.error).not.toContain("probe-secret-value-123456");
+    expect(result.error).toContain("[REDACTED]");
+  });
+
+  it("redacts secret values out of the reported model name", async () => {
+    const port: ChatPort = {
+      model: "free-model",
+      chat: async () => ({ text: "OK", model: `weird-model-${"probe-secret-value-123456"}` }),
+    };
+    const result = await runConnectivityCheck(port, { secrets });
+    expect(result.ok).toBe(true);
+    expect(result.model).not.toContain("probe-secret-value-123456");
+    expect(result.model).toContain("[REDACTED]");
   });
 });
 

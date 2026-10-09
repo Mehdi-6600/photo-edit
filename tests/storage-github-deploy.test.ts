@@ -7,7 +7,7 @@ import { createRun } from "@/lib/engine";
 import { analyzeIdeaHeuristic } from "@/lib/planner";
 import { listVercelDeployments, triggerDeployHook, validateDeployHookUrl, verifyProductionUrl } from "@/lib/deploy";
 import { ConflictError, createFileStore, createMemoryStore, createUpstashStore, InvalidInputError } from "@/lib/store";
-import { createProjectRun, createServices, readConfig, REPO_SETTING_KEY } from "@/lib/services";
+import { createProjectRun, createServices, isWithinRepositoryLock, readConfig, repositoryLockState, REPO_SETTING_KEY } from "@/lib/services";
 import type { Run } from "@/lib/types";
 
 const NOW = new Date("2026-10-09T09:00:00Z");
@@ -165,6 +165,30 @@ describe("repository selection lock", () => {
     expect(await services.repository()).toBeNull();
     expect(services.githubFor("octo", "demo")).toBeNull();
   });
+
+  it("describes the lock state and tests membership case-insensitively", () => {
+    expect(repositoryLockState({ githubRepository: { owner: "Owner", name: "Locked" }, repositoryConfigError: undefined })).toEqual({
+      locked: true,
+      reason: "environment",
+      repository: { owner: "Owner", name: "Locked" },
+    });
+    expect(repositoryLockState({ githubRepository: undefined, repositoryConfigError: "GITHUB_REPOSITORY must use the owner/name format." })).toEqual({
+      locked: true,
+      reason: "config-error",
+      repository: null,
+    });
+    expect(repositoryLockState({ githubRepository: undefined, repositoryConfigError: undefined })).toEqual({
+      locked: false,
+      reason: null,
+      repository: null,
+    });
+    const lock = { owner: "Owner", name: "Locked" };
+    expect(isWithinRepositoryLock(lock, "owner", "LOCKED")).toBe(true);
+    expect(isWithinRepositoryLock(lock, "other", "locked")).toBe(false);
+    expect(isWithinRepositoryLock(lock, "owner", "locked-again")).toBe(false);
+    expect(isWithinRepositoryLock(null, "any", "repo")).toBe(true);
+    expect(isWithinRepositoryLock(undefined, "any", "repo")).toBe(true);
+  });
 });
 
 describe("GitHub client", () => {
@@ -290,6 +314,63 @@ describe("GitHub client", () => {
     });
     expect(calls.length).toBe(7);
     expect(calls.every((call) => call.method === "GET")).toBe(true);
+  });
+
+  it("reports partial access when some read probes are denied", async () => {
+    const fakeFetch = (async (url: string | URL | Request) => {
+      const parsed = new URL(String(url));
+      let payload: unknown = {};
+      let status = 200;
+      if (parsed.pathname === "/user") payload = { login: "octo" };
+      else if (parsed.pathname === "/repos/octo/demo") {
+        payload = {
+          full_name: "octo/demo",
+          default_branch: "main",
+          private: true,
+          archived: false,
+          html_url: "https://github.com/octo/demo",
+          permissions: { admin: false, push: false, pull: true },
+        };
+      } else if (parsed.pathname.endsWith("/git/ref/heads/main")) payload = { object: { sha: "base-sha" } };
+      else if (parsed.pathname.endsWith("/git/trees/base-sha")) payload = { tree: [] };
+      else if (parsed.pathname.endsWith("/check-runs")) {
+        payload = { message: "Resource not accessible by integration" };
+        status = 403;
+      } else if (parsed.pathname.endsWith("/actions/runs")) {
+        payload = { message: "Resource not accessible by integration" };
+        status = 403;
+      } else if (parsed.pathname.endsWith("/pulls")) payload = [];
+      return new Response(JSON.stringify(payload), { status });
+    }) as typeof fetch;
+    const client = new GitHubClient("token-value", "octo", "demo", { fetchImpl: fakeFetch, sleep: async () => undefined });
+    const result = await client.probePermissions();
+    expect(result).toMatchObject({
+      authenticatedAs: "octo",
+      repositoryReadable: true,
+      contentsReadable: true,
+      checksReadable: false,
+      actionsReadable: false,
+      pullRequestsReadable: true,
+      accountCanPush: false,
+    });
+  });
+
+  it("reports every probe unavailable when the token itself is rejected", async () => {
+    let calls = 0;
+    const fakeFetch = (async () => {
+      calls += 1;
+      return new Response(JSON.stringify({ message: "Bad credentials" }), { status: 401 });
+    }) as typeof fetch;
+    const client = new GitHubClient("bad-token", "octo", "demo", { fetchImpl: fakeFetch, sleep: async () => undefined });
+    const result = await client.probePermissions();
+    expect(result.authenticatedAs).toBeNull();
+    expect(result.repositoryReadable).toBe(false);
+    expect(result.contentsReadable).toBe(false);
+    expect(result.actionsReadable).toBe(false);
+    expect(result.checksReadable).toBe(false);
+    expect(result.pullRequestsReadable).toBe(false);
+    expect(result.accountCanPush).toBeNull();
+    expect(calls).toBe(1);
   });
 
   it("creates a commit with blobs, tree and fast-forward ref update", async () => {

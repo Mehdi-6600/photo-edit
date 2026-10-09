@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { HttpError, json, withSession } from "@/lib/api";
-import { clientKey, rateLimit, redact, stripControlChars } from "@/lib/security";
+import { runConnectivityCheck } from "@/lib/model";
+import { clientKey, rateLimit } from "@/lib/security";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -12,24 +13,20 @@ export async function POST(request: NextRequest) {
     if (!limit.allowed) throw new HttpError(429, "Too many model checks. Wait a minute and try again.");
     if (!services.model) throw new HttpError(422, "No model is configured. Set LLM_BASE_URL and LLM_MODEL first.");
 
-    const startedAt = services.now().getTime();
-    const response = await services.model.chat(
-      [
-        { role: "system", content: "This is a connectivity check. Reply with exactly the two letters OK and nothing else." },
-        { role: "user", content: "Reply OK." },
-      ],
-      { maxTokens: 8, temperature: 0, maxAttempts: 1 },
-    );
-    const elapsedMs = Math.max(0, services.now().getTime() - startedAt);
-    const replyAccepted = /^ok[.!]?$/i.test(response.text.trim());
-    const safeModel = stripControlChars(redact(response.model, services.config.secrets)).slice(0, 120);
+    const result = await runConnectivityCheck(services.model, {
+      secrets: services.config.secrets,
+      now: services.now,
+    });
     await services.audit({
       actor: "owner",
       action: "model.connectivity_check",
-      target: safeModel,
-      result: replyAccepted ? "ok" : "error",
-      detail: `${elapsedMs}ms`,
+      target: result.model ?? "unknown",
+      result: result.ok && result.replyAccepted ? "ok" : "error",
+      detail: `${result.elapsedMs}ms`,
     });
-    return json({ ok: true, replyAccepted, model: safeModel, elapsedMs });
+    if (!result.ok) {
+      throw new HttpError(502, result.error ?? "The model endpoint could not be reached.");
+    }
+    return json({ ok: true, replyAccepted: result.replyAccepted, model: result.model, elapsedMs: result.elapsedMs });
   });
 }

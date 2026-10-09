@@ -9,6 +9,7 @@ import {
   createRun,
   finishStep,
   pauseRun,
+  redactEvidence,
   resumeRun,
   retryTask,
 } from "@/lib/engine";
@@ -273,5 +274,51 @@ describe("delivery engine", () => {
     const clock = new FixedClock(START);
     const run = newRun(clock);
     expect(run.tasks.debug.status).toBe("skipped");
+  });
+});
+
+describe("evidence redaction", () => {
+  it("removes secrets and control characters from every evidence field", () => {
+    const secret = "evidence-secret-value-123456";
+    const item = redactEvidence(
+      {
+        label: `ci ${secret}`,
+        value: `failed with ${secret}\u0007bell`,
+        url: `https://github.com/octo/demo/runs/${secret}`,
+      },
+      [secret],
+    );
+    expect(JSON.stringify(item)).not.toContain(secret);
+    expect(item.value).not.toContain("\u0007");
+    expect(item.label).toContain("[REDACTED]");
+    expect(item.value).toContain("[REDACTED]");
+    expect(item.url).toContain("[REDACTED]");
+  });
+
+  it("truncates long evidence fields before storage", () => {
+    const item = redactEvidence({ label: "x".repeat(500), value: "y".repeat(5000), url: `https://github.com/${"z".repeat(3000)}` }, []);
+    expect(item.label).toHaveLength(120);
+    expect(item.value).toHaveLength(2000);
+    expect(item.url).toHaveLength(1000);
+  });
+
+  it("redacts step evidence before it is stored on the run", () => {
+    const clock = new FixedClock(START);
+    const run = newRun(clock);
+    const secret = "evidence-secret-value-123456";
+    const ctx = makeContext({ clock, github: new FakeGitHub(), model: new FakeModel(), secrets: [secret] });
+    finishStep(
+      run,
+      "checks",
+      {
+        outcome: "succeeded",
+        output: "All CI checks passed.",
+        evidence: [{ label: "CI log", value: `token ${secret} leaked in output`, url: `https://github.com/octo/demo/runs/${secret}` }],
+      },
+      ctx,
+    );
+    const stored = JSON.stringify(run.tasks.checks.evidence);
+    expect(stored).not.toContain(secret);
+    expect(stored).toContain("[REDACTED]");
   });
 });

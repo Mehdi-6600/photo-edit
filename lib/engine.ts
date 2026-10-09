@@ -166,13 +166,22 @@ function pollIntervalMs(def: TaskDef): number {
   return def.kind === "verify" ? 30_000 : 20_000;
 }
 
-function mergeEvidence(state: TaskState, evidence: Evidence[] | undefined, secrets: readonly string[]): void {
-  if (!evidence || evidence.length === 0) return;
-  const safeEvidence = evidence.map((item) => ({
+/**
+ * Sanitizes one evidence item before display or storage: known secret values and
+ * well-known credential shapes are removed, control characters stripped, and each
+ * field truncated. Evidence from CI output, model replies and URLs is never trusted.
+ */
+export function redactEvidence(item: Evidence, secrets: readonly string[]): Evidence {
+  return {
     label: stripControlChars(redact(String(item.label), secrets)).slice(0, 120),
     value: stripControlChars(redact(String(item.value), secrets)).slice(0, 2000),
     url: item.url ? stripControlChars(redact(String(item.url), secrets)).slice(0, 1000) : undefined,
-  }));
+  };
+}
+
+function mergeEvidence(state: TaskState, evidence: Evidence[] | undefined, secrets: readonly string[]): void {
+  if (!evidence || evidence.length === 0) return;
+  const safeEvidence = evidence.map((item) => redactEvidence(item, secrets));
   const keep = state.evidence.filter((item) => !safeEvidence.some((next) => next.label === item.label));
   state.evidence = [...keep, ...safeEvidence].slice(-30);
 }
