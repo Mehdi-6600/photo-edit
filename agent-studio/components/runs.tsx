@@ -189,7 +189,7 @@ export function RunDetail({ id }: { id: string }) {
         {run.status === "failed" ? <Notice tone="danger">{t("run.failed")}</Notice> : null}
         {run.status === "paused" ? <Notice tone="neutral">{t("run.paused")}</Notice> : null}
         {run.status === "cancelled" ? <Notice tone="neutral">{t("run.cancelled")}</Notice> : null}
-        {run.status === "waiting" || run.status === "running" ? (
+        {run.order.some((taskId) => run.tasks[taskId].status === "waiting") ? (
           <p className="text-sm text-[var(--muted)]">{t("run.waitingHint")}</p>
         ) : null}
         {run.stopReason && (run.status === "waiting" || run.status === "failed") ? (

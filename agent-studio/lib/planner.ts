@@ -31,10 +31,14 @@ function detectFeatures(idea: string): string[] {
   return FEATURE_RULES.filter((rule) => rule.pattern.test(idea)).map((rule) => rule.tag);
 }
 
+/** First sentence of the idea, shortened at a word boundary so titles never end mid-word. */
 function titleFrom(idea: string): string {
-  const firstSentence = idea.split(/[.!?\n]/)[0] ?? idea;
-  const trimmed = cleanText(firstSentence, 80);
-  return trimmed.length > 0 ? trimmed : "Untitled project";
+  const firstSentence = cleanText(idea.split(/[.!?\n]/)[0] ?? idea, 400);
+  if (firstSentence.length === 0) return "Untitled project";
+  if (firstSentence.length <= 90) return firstSentence;
+  const cut = firstSentence.slice(0, 90);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trim();
 }
 
 function requirement(id: string, text: string, priority: Priority, acceptance: string[]): Requirement {

@@ -124,9 +124,10 @@ describe.skipIf(!enabled)("GitHub end-to-end delivery (real API)", () => {
           current = latest;
           break;
         }
-        await advanceProjectRun(services, runId, "e2e-test");
-        current = (await services.store.getRun(runId)) as Run;
-        if (current.status === "waiting" && current.tasks.checks.status === "waiting") {
+        const step = await advanceProjectRun(services, runId, "e2e-test");
+        current = step.run;
+        console.log(`E2E_STEP ${new Date().toISOString()} ${step.didWork ? "worked" : "idle"}: ${step.message.slice(0, 160)}`);
+        if (!step.didWork || (current.status === "waiting" && current.tasks.checks.status === "waiting")) {
           await new Promise((resolve) => setTimeout(resolve, 15_000));
         }
       }
