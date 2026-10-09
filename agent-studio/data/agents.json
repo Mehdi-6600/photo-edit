@@ -1,0 +1,1515 @@
+{
+  "schemaVersion": 1,
+  "researchedAt": "2026-10-09",
+  "method": "GitHub REST API (repository metadata, license, latest release) plus each project's own README and LICENSE, plus installs from PyPI and npm to confirm CLI flags. Stars are recorded for context only and do not affect ranking. Re-check with: npm run registry:verify. Integration verification levels: installed-and-checked (CLI installed from PyPI or npm and flags read with --help), docs-only (claims taken from the project's README or docs), not-verified (metadata only).",
+  "freeUseClasses": {
+    "A": "Free software: OSI-approved license, no paid license needed.",
+    "B": "Free model weights: open weights you can download and run locally. Check each model's own license.",
+    "C": "Free inference: requests served at no charge (for example, a model running on your own machine through Ollama).",
+    "D": "Free hosting: a platform tier that hosts the app or runs CI at no cost, within stated limits.",
+    "E": "Free tier with quotas: a paid provider's free allowance with rate or daily limits, which can change at any time."
+  },
+  "agents": [
+    {
+      "id": "mini-swe-agent",
+      "name": "mini-swe-agent",
+      "repo": "SWE-agent/mini-swe-agent",
+      "category": "cli-coding-agent",
+      "status": "active",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-06",
+        "latestRelease": "v2.4.6",
+        "latestReleaseAt": "2026-07-23",
+        "openIssues": 91
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Runs with local models or any model reachable through LiteLLM, including free tiers. The tool itself costs nothing."
+      },
+      "interfaces": [
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "installed-and-checked",
+        "verified": "Installed mini-swe-agent 2.4.6 from PyPI. CLI options --task/-t, --model/-m, --yolo/-y, --cost-limit/-l and --output/-o were confirmed with --help.",
+        "invocation": "mini --task \"<task>\" --model <litellm-model> --yolo --cost-limit 0 --output <file>"
+      },
+      "capabilities": [
+        "code-edit",
+        "run-tests",
+        "shell-commands",
+        "debugging"
+      ],
+      "roles": [
+        "debugging"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python 3.10+ (installed and run on Python 3.11 here)"
+      },
+      "risks": [
+        "Runs model-chosen shell commands, so it must run only in a disposable CI runner with no production secrets.",
+        "Uses --yolo (no confirmations), so it needs branch isolation and review."
+      ],
+      "adapter": {
+        "status": "documented",
+        "note": "Invocation verified locally. Not executed in this deployment because no model endpoint was reachable from the build sandbox."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license and maintenance (pushed 2026-10-06, release v2.4.6 on 2026-07-23)",
+          "url": "https://github.com/SWE-agent/mini-swe-agent"
+        },
+        {
+          "claim": "Model support through LiteLLM and OpenRouter; local execution environments",
+          "url": "https://github.com/SWE-agent/mini-swe-agent"
+        },
+        {
+          "claim": "CLI options (verified from installed package)",
+          "url": "https://pypi.org/project/mini-swe-agent/"
+        }
+      ]
+    },
+    {
+      "id": "aider",
+      "name": "Aider",
+      "repo": "Aider-AI/aider",
+      "category": "cli-coding-agent",
+      "status": "active",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-05-22",
+        "latestRelease": "v0.86.0",
+        "latestReleaseAt": "2025-08-09",
+        "openIssues": 1909
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Works with local models (per its README) or with a free-tier API key you configure."
+      },
+      "interfaces": [
+        "cli-headless",
+        "git"
+      ],
+      "integration": {
+        "verification": "installed-and-checked",
+        "verified": "Installed aider-chat 0.86.2 from PyPI. Options --message/-m, --yes-always, --no-auto-commits, --model, --openai-api-base, --file and --exit were confirmed with --help.",
+        "invocation": "aider --message \"<task>\" --yes-always --no-auto-commits --model <model> --file <path>"
+      },
+      "capabilities": [
+        "code-edit",
+        "git-commits",
+        "repo-map",
+        "run-tests"
+      ],
+      "roles": [
+        "frontend",
+        "backend"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python package (aider-chat)"
+      },
+      "risks": [
+        "--yes-always accepts every edit, so run it only on an isolated agent branch.",
+        "Sends repository content to the chosen model provider."
+      ],
+      "adapter": {
+        "status": "documented",
+        "note": "Invocation verified locally. A CI runner wrapper is planned; the build relies on the model patch adapter instead."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0, pushed 2026-05-22, release v0.86.0 on 2025-08-09",
+          "url": "https://github.com/Aider-AI/aider"
+        },
+        {
+          "claim": "Can connect to almost any LLM, including local models",
+          "url": "https://github.com/Aider-AI/aider"
+        },
+        {
+          "claim": "CLI options (verified from installed package)",
+          "url": "https://pypi.org/project/aider-chat/"
+        }
+      ]
+    },
+    {
+      "id": "gemini-cli",
+      "name": "Gemini CLI",
+      "repo": "google-gemini/gemini-cli",
+      "category": "cli-coding-agent",
+      "status": "active",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-08",
+        "latestRelease": "v0.63.0",
+        "latestReleaseAt": "2026-10-06",
+        "openIssues": 757
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "E"
+        ],
+        "note": "Free software. The README lists a free tier of 60 requests per minute and 1,000 requests per day with a personal Google account. Quotas can change."
+      },
+      "interfaces": [
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README documents headless use with gemini -p \"...\". Installed from npm as @google/gemini-cli 0.63.0.",
+        "invocation": "gemini -p \"<prompt>\""
+      },
+      "capabilities": [
+        "code-edit",
+        "review",
+        "shell-commands"
+      ],
+      "roles": [
+        "review"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Node.js"
+      },
+      "risks": [
+        "Free-tier prompts are subject to Google's free-tier data terms. Do not send private code you cannot share.",
+        "Interactive login is needed on first use, which complicates headless CI."
+      ],
+      "adapter": {
+        "status": "documented",
+        "note": "Recommended as an optional second reviewer. Not wired in this build."
+      },
+      "evidence": [
+        {
+          "claim": "Apache 2.0, free-tier limits and headless flag stated in README",
+          "url": "https://github.com/google-gemini/gemini-cli"
+        },
+        {
+          "claim": "npm package version",
+          "url": "https://www.npmjs.com/package/@google/gemini-cli"
+        }
+      ]
+    },
+    {
+      "id": "qwen-code",
+      "name": "Qwen Code",
+      "repo": "QwenLM/qwen-code",
+      "category": "cli-coding-agent",
+      "status": "active",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-09",
+        "latestRelease": "sdk-typescript-v0.1.18",
+        "latestReleaseAt": "2026-10-05",
+        "openIssues": 1751
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Supports local models (Ollama or vLLM) and third-party OpenAI-compatible APIs. Hosted quotas depend on the provider you choose."
+      },
+      "interfaces": [
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README documents headless use with qwen -p \"...\" and multi-provider support. Installed from npm as @qwen-code/qwen-code 0.25.0.",
+        "invocation": "qwen -p \"<prompt>\""
+      },
+      "capabilities": [
+        "code-edit",
+        "review",
+        "shell-commands"
+      ],
+      "roles": [
+        "review"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Node.js"
+      },
+      "risks": [
+        "Agent can run shell commands; run only in isolated CI or a sandbox.",
+        "Provider choice determines the data policy."
+      ],
+      "adapter": {
+        "status": "documented",
+        "note": "Alternative headless reviewer. Not wired in this build."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0 license, OpenAI-compatible and Ollama support, headless -p mode",
+          "url": "https://github.com/QwenLM/qwen-code"
+        },
+        {
+          "claim": "npm package version",
+          "url": "https://www.npmjs.com/package/@qwen-code/qwen-code"
+        }
+      ]
+    },
+    {
+      "id": "goose",
+      "name": "goose",
+      "repo": "aaif-goose/goose",
+      "category": "cli-coding-agent",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-09",
+        "latestRelease": "v1.54.0",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 480
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Supports Ollama and OpenRouter, so it can run at zero cost with local or free-tier models."
+      },
+      "interfaces": [
+        "cli-headless",
+        "desktop"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Repository moved from block/goose to aaif-goose/goose. README states 15+ providers including Ollama and OpenRouter. CLI flags were not verified in this build.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands",
+        "run-tests"
+      ],
+      "roles": [
+        "debugging"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Native binary"
+      },
+      "risks": [
+        "Full tool access on the machine it runs on."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional upgrade. Install-method and headless flags still need verification before use."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0, provider list including Ollama and OpenRouter",
+          "url": "https://github.com/aaif-goose/goose"
+        }
+      ]
+    },
+    {
+      "id": "cline",
+      "name": "Cline",
+      "repo": "cline/cline",
+      "category": "agent-platform",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-09",
+        "latestRelease": "desktop-v0.0.45",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 1637
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. README lists Ollama and LM Studio for local models and any OpenAI-compatible API."
+      },
+      "interfaces": [
+        "cli-headless",
+        "ide",
+        "sdk"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "README documents a headless CLI for CI/CD and an SDK (@cline/sdk). Flags were not verified in this build.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands",
+        "run-tests"
+      ],
+      "roles": [
+        "frontend",
+        "backend"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Node.js (CLI) or VS Code (IDE)"
+      },
+      "risks": [
+        "Broad tool permissions in headless mode; restrict to isolated runners."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional. Good candidate once headless flags are verified."
+      },
+      "evidence": [
+        {
+          "claim": "Apache 2.0, headless CLI for CI/CD, Ollama and LM Studio support",
+          "url": "https://github.com/cline/cline"
+        }
+      ]
+    },
+    {
+      "id": "kilo-code",
+      "name": "Kilo Code CLI",
+      "repo": "Kilo-Org/kilocode",
+      "category": "cli-coding-agent",
+      "status": "optional",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-08",
+        "latestRelease": "jetbrains/v7.1.9",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 599
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "E"
+        ],
+        "note": "Free software. Free model availability depends on the Kilo gateway and can change; not verified."
+      },
+      "interfaces": [
+        "cli-headless",
+        "ide"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README: npm install -g @kilocode/cli and kilo run --auto \"...\". npm package 7.8.8 exists.",
+        "invocation": "kilo run --auto \"<prompt>\""
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands"
+      ],
+      "roles": [
+        "frontend",
+        "backend"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Node.js"
+      },
+      "risks": [
+        "Auto mode executes changes without confirmation."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional. Zero-cost model path not verified."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license and kilo run --auto usage",
+          "url": "https://github.com/Kilo-Org/kilocode"
+        }
+      ]
+    },
+    {
+      "id": "opencode",
+      "name": "opencode",
+      "repo": "anomalyco/opencode",
+      "category": "cli-coding-agent",
+      "status": "optional",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-09",
+        "latestRelease": "v1.18.35",
+        "latestReleaseAt": "2026-10-06",
+        "openIssues": 6173
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Provider choice decides cost; free-model availability not verified in this build."
+      },
+      "interfaces": [
+        "cli-interactive",
+        "tui"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Installed path documented in README (install script). npm package opencode-ai 1.18.35 exists. Non-interactive flags were not verified.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands"
+      ],
+      "roles": [
+        "frontend",
+        "backend"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Native binary (install script)"
+      },
+      "risks": [
+        "Shell and file tools; isolate in CI."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional. Needs headless verification."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license and install instructions",
+          "url": "https://github.com/anomalyco/opencode"
+        }
+      ]
+    },
+    {
+      "id": "openhands",
+      "name": "OpenHands",
+      "repo": "OpenHands/OpenHands",
+      "category": "agent-platform",
+      "status": "optional",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-09",
+        "latestRelease": "v1.26.0",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 961
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Zero-cost use needs a local or free-tier model plus Docker on your own machine."
+      },
+      "interfaces": [
+        "web-ui",
+        "agent-server",
+        "docker"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README requires Node.js 24+ for Agent Canvas and Docker for sandboxed conversations. Headless API not verified.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands",
+        "run-tests",
+        "browser"
+      ],
+      "roles": [
+        "backend",
+        "frontend"
+      ],
+      "requirements": {
+        "docker": true,
+        "gpu": false,
+        "runtime": "Node.js 24+ and Docker"
+      },
+      "risks": [
+        "Heavy: needs Docker and a sandbox runtime. Not suitable for free CI runners as a default."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional upgrade for a self-hosted machine with Docker."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license; Docker and Node 24 requirements listed in README",
+          "url": "https://github.com/OpenHands/OpenHands"
+        }
+      ]
+    },
+    {
+      "id": "open-interpreter",
+      "name": "Open Interpreter",
+      "repo": "openinterpreter/openinterpreter",
+      "category": "cli-coding-agent",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-07",
+        "latestRelease": "rust-v0.0.56",
+        "latestReleaseAt": "2026-10-07",
+        "openIssues": 11
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. README says it runs any OpenAI-compatible provider through chat completions."
+      },
+      "interfaces": [
+        "cli-headless",
+        "sdk"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README documents interpreter exec --chat-completions. Not installed or run in this build.",
+        "invocation": "interpreter exec --chat-completions"
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands"
+      ],
+      "roles": [
+        "debugging"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Native binary"
+      },
+      "risks": [
+        "Executes code on the host. Use an isolated runner."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional. Project was rewritten in Rust; re-verify before use."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0 and exec --chat-completions usage",
+          "url": "https://github.com/openinterpreter/openinterpreter"
+        }
+      ]
+    },
+    {
+      "id": "continue",
+      "name": "Continue",
+      "repo": "continuedev/continue",
+      "category": "ide-extension",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-08",
+        "latestRelease": "v2.0.0-vscode",
+        "latestReleaseAt": "2026-06-19",
+        "openIssues": 827
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Model access is configured by the user."
+      },
+      "interfaces": [
+        "ide"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "README is IDE-focused. Headless CLI not verified.",
+        "invocation": "not applicable"
+      },
+      "capabilities": [
+        "code-edit",
+        "chat"
+      ],
+      "roles": [
+        "frontend"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "VS Code or JetBrains"
+      },
+      "risks": [
+        "Editor-bound; no unattended CI mode verified."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Good for a developer on a laptop, not for the unattended pipeline."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0 license",
+          "url": "https://github.com/continuedev/continue"
+        }
+      ]
+    },
+    {
+      "id": "chatdev",
+      "name": "ChatDev",
+      "repo": "OpenBMB/ChatDev",
+      "category": "multi-agent-framework",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-07-24",
+        "latestRelease": "v2.2.0",
+        "latestReleaseAt": "2026-03-23",
+        "openIssues": 82
+      },
+      "freeUse": {
+        "classes": [
+          "A"
+        ],
+        "note": "Free software, but the README requires API keys in .env for its model calls."
+      },
+      "interfaces": [
+        "web-ui",
+        "docker"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README documents Docker Compose setup and .env API keys.",
+        "invocation": "docker compose up --build"
+      },
+      "capabilities": [
+        "multi-agent",
+        "code-generation"
+      ],
+      "roles": [
+        "architect"
+      ],
+      "requirements": {
+        "docker": true,
+        "gpu": false,
+        "runtime": "Docker and Node.js for the frontend"
+      },
+      "risks": [
+        "Generated code is executed by its own sandbox; isolate it."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Reference design for role collaboration only. Not used as the execution engine."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0 and Docker Compose setup",
+          "url": "https://github.com/OpenBMB/ChatDev"
+        }
+      ]
+    },
+    {
+      "id": "metagpt",
+      "name": "MetaGPT",
+      "repo": "FoundationAgents/MetaGPT",
+      "category": "multi-agent-framework",
+      "status": "optional",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-01-21",
+        "latestRelease": "v0.8.1",
+        "latestReleaseAt": "2024-04-22",
+        "openIssues": 140
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Its README shows configuration for Ollama and other providers."
+      },
+      "interfaces": [
+        "cli-headless",
+        "library"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README: pip install --upgrade metagpt. Release is from 2024, so maintenance is a risk.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "multi-agent",
+        "code-generation"
+      ],
+      "roles": [
+        "architect"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "Latest release is older than 18 months.",
+        "Heavy multi-role runs use many model calls."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional reference only."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license; pip install instructions; last release 2024-04-22",
+          "url": "https://github.com/FoundationAgents/MetaGPT"
+        }
+      ]
+    },
+    {
+      "id": "swe-agent",
+      "name": "SWE-agent",
+      "repo": "SWE-agent/SWE-agent",
+      "category": "cli-coding-agent",
+      "status": "optional",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-06",
+        "latestRelease": "v1.1.0",
+        "latestReleaseAt": "2025-05-22",
+        "openIssues": 151
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software. Model access depends on the LiteLLM configuration."
+      },
+      "interfaces": [
+        "cli-headless",
+        "docker"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Repository and license checked. Install and runtime were not verified in this build.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit",
+        "run-tests",
+        "benchmarks"
+      ],
+      "roles": [
+        "debugging"
+      ],
+      "requirements": {
+        "docker": true,
+        "gpu": false,
+        "runtime": "Python plus container runtime (per its docs)"
+      },
+      "risks": [
+        "Heavier than mini-swe-agent; needs a container runtime."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional. mini-swe-agent is the lighter option in the same project."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license; repository activity",
+          "url": "https://github.com/SWE-agent/SWE-agent"
+        }
+      ]
+    },
+    {
+      "id": "codex-cli",
+      "name": "OpenAI Codex CLI",
+      "repo": "openai/codex",
+      "category": "cli-coding-agent",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-09",
+        "latestRelease": "rust-v0.162.0",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 21644
+      },
+      "freeUse": {
+        "classes": [
+          "A"
+        ],
+        "note": "Free software, but use requires a paid ChatGPT plan or an OpenAI API key, so it is NOT zero-cost."
+      },
+      "interfaces": [
+        "cli-interactive",
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "README: npm install -g @openai/codex; sign-in with ChatGPT plan or API key.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit",
+        "shell-commands"
+      ],
+      "roles": [
+        "frontend",
+        "backend"
+      ],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Node.js"
+      },
+      "risks": [
+        "Paid access required."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Optional upgrade only. Excluded from the zero-cost team."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0; ChatGPT plan or API key sign-in",
+          "url": "https://github.com/openai/codex"
+        }
+      ]
+    },
+    {
+      "id": "smolagents",
+      "name": "smolagents",
+      "repo": "huggingface/smolagents",
+      "category": "library",
+      "status": "optional",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-06",
+        "latestRelease": "v1.26.0",
+        "latestReleaseAt": "2026-05-29",
+        "openIssues": 881
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "C",
+          "E"
+        ],
+        "note": "Free library. Inference depends on the model provider you connect."
+      },
+      "interfaces": [
+        "library"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "Repository and release checked. It is a library, not a coding agent.",
+        "invocation": "library import"
+      },
+      "capabilities": [
+        "agent-framework"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "Library only; you would need to build the coding workflow yourself."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Considered for orchestration helpers, not used."
+      },
+      "evidence": [
+        {
+          "claim": "Apache-2.0 license and recent release",
+          "url": "https://github.com/huggingface/smolagents"
+        }
+      ]
+    },
+    {
+      "id": "crewai",
+      "name": "CrewAI",
+      "repo": "crewAIInc/crewAI",
+      "category": "library",
+      "status": "optional",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-08",
+        "latestRelease": "1.15.26",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 574
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "C",
+          "E"
+        ],
+        "note": "Free library. Inference depends on the connected provider."
+      },
+      "interfaces": [
+        "library"
+      ],
+      "integration": {
+        "verification": "docs-only",
+        "verified": "Repository and release checked. It is a framework, not a coding agent.",
+        "invocation": "library import"
+      },
+      "capabilities": [
+        "agent-framework"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "Framework only."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Considered for orchestration patterns, not used."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license and recent release",
+          "url": "https://github.com/crewAIInc/crewAI"
+        }
+      ]
+    },
+    {
+      "id": "plandex",
+      "name": "Plandex",
+      "repo": "plandex-ai/plandex",
+      "category": "cli-coding-agent",
+      "status": "excluded",
+      "exclusionReason": "No code push in more than 12 months (last push 2025-10-03).",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2025-10-03",
+        "latestRelease": "cli/v2.2.1",
+        "latestReleaseAt": "2025-07-16",
+        "openIssues": 66
+      },
+      "freeUse": {
+        "classes": [
+          "A",
+          "B",
+          "C",
+          "E"
+        ],
+        "note": "Free software; model access is user-configured."
+      },
+      "interfaces": [
+        "cli-interactive"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Repository metadata only.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Go binary"
+      },
+      "risks": [
+        "Stale maintenance."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license; last push 2025-10-03",
+          "url": "https://github.com/plandex-ai/plandex"
+        }
+      ]
+    },
+    {
+      "id": "agentless",
+      "name": "Agentless",
+      "repo": "OpenAutoCoder/Agentless",
+      "category": "research-code",
+      "status": "excluded",
+      "exclusionReason": "No code push since 2024-12-22; research artifact.",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2024-12-22",
+        "latestRelease": "v1.5.0",
+        "latestReleaseAt": "2024-10-29",
+        "openIssues": 55
+      },
+      "freeUse": {
+        "classes": [
+          "A"
+        ],
+        "note": "Free software."
+      },
+      "interfaces": [
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Repository metadata only.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "issue-localization"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "Research code, stale."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "MIT license; last push 2024-12-22",
+          "url": "https://github.com/OpenAutoCoder/Agentless"
+        }
+      ]
+    },
+    {
+      "id": "auto-code-rover",
+      "name": "AutoCodeRover",
+      "repo": "AutoCodeRoverSG/auto-code-rover",
+      "category": "research-code",
+      "status": "excluded",
+      "exclusionReason": "License not detected by GitHub and no push since 2025-04-24.",
+      "license": {
+        "spdx": "NOASSERTION",
+        "osi": false,
+        "note": "GitHub could not detect a standard license."
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2025-04-24",
+        "latestRelease": "v1.1.0",
+        "latestReleaseAt": "2024-09-10",
+        "openIssues": 21
+      },
+      "freeUse": {
+        "classes": [],
+        "note": "Usage rights unclear."
+      },
+      "interfaces": [
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Repository metadata only.",
+        "invocation": "not verified"
+      },
+      "capabilities": [
+        "code-edit"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "Unclear license.",
+        "Stale."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "GitHub reports NOASSERTION license; last push 2025-04-24",
+          "url": "https://github.com/AutoCodeRoverSG/auto-code-rover"
+        }
+      ]
+    },
+    {
+      "id": "gpt-engineer",
+      "name": "gpt-engineer",
+      "repo": "AntonOsika/gpt-engineer",
+      "category": "cli-coding-agent",
+      "status": "excluded",
+      "exclusionReason": "Repository is archived on GitHub.",
+      "license": {
+        "spdx": "MIT",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": true,
+        "pushedAt": "2025-05-14",
+        "latestRelease": "v0.3.1",
+        "latestReleaseAt": "2024-06-06",
+        "openIssues": 70
+      },
+      "freeUse": {
+        "classes": [
+          "A"
+        ],
+        "note": "Free software; archived."
+      },
+      "interfaces": [
+        "cli-headless"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Archived flag confirmed through the GitHub API.",
+        "invocation": "not applicable"
+      },
+      "capabilities": [
+        "code-generation"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "No maintenance."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "archived: true in GitHub API",
+          "url": "https://github.com/AntonOsika/gpt-engineer"
+        }
+      ]
+    },
+    {
+      "id": "roo-code",
+      "name": "Roo Code",
+      "repo": "RooCodeInc/Roo-Code",
+      "category": "ide-extension",
+      "status": "excluded",
+      "exclusionReason": "Repository is archived on GitHub (last push 2026-05-15).",
+      "license": {
+        "spdx": "Apache-2.0",
+        "osi": true
+      },
+      "maintenance": {
+        "archived": true,
+        "pushedAt": "2026-05-15",
+        "latestRelease": "v3.54.0",
+        "latestReleaseAt": "2026-05-15",
+        "openIssues": 1033
+      },
+      "freeUse": {
+        "classes": [
+          "A"
+        ],
+        "note": "Free software; archived."
+      },
+      "interfaces": [
+        "ide"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Archived flag confirmed through the GitHub API.",
+        "invocation": "not applicable"
+      },
+      "capabilities": [
+        "code-edit"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "VS Code"
+      },
+      "risks": [
+        "No further maintenance."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "archived: true in GitHub API",
+          "url": "https://github.com/RooCodeInc/Roo-Code"
+        }
+      ]
+    },
+    {
+      "id": "gpt-pilot",
+      "name": "GPT Pilot",
+      "repo": "Pythagora-io/gpt-pilot",
+      "category": "multi-agent-framework",
+      "status": "excluded",
+      "exclusionReason": "Functional Source License (FSL-1.1-MIT). Source-available, not OSI open source during the non-compete period.",
+      "license": {
+        "spdx": "FSL-1.1-MIT",
+        "osi": false,
+        "note": "GitHub reports NOASSERTION; the LICENSE file is FSL-1.1-MIT."
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-06-18",
+        "latestRelease": "none",
+        "latestReleaseAt": null,
+        "openIssues": 252
+      },
+      "freeUse": {
+        "classes": [],
+        "note": "Not OSI open source today."
+      },
+      "interfaces": [
+        "cli-interactive"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "LICENSE file read through the GitHub API.",
+        "invocation": "not applicable"
+      },
+      "capabilities": [
+        "code-generation"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "License restricts competing commercial use until conversion."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "LICENSE: Functional Source License, Version 1.1, MIT Future License",
+          "url": "https://github.com/Pythagora-io/gpt-pilot"
+        }
+      ]
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "repo": "anthropics/claude-code",
+      "category": "cli-coding-agent",
+      "status": "excluded",
+      "exclusionReason": "Proprietary license (© Anthropic PBC) and subject to commercial terms, so it is not open source and requires a paid plan or API.",
+      "license": {
+        "spdx": "NONE",
+        "osi": false,
+        "note": "LICENSE.md states use is subject to Anthropic's Commercial Terms."
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-10-08",
+        "latestRelease": "v2.1.295",
+        "latestReleaseAt": "2026-10-08",
+        "openIssues": 14605
+      },
+      "freeUse": {
+        "classes": [],
+        "note": "Not free to use."
+      },
+      "interfaces": [
+        "cli-interactive"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "LICENSE.md read through the GitHub API.",
+        "invocation": "not applicable"
+      },
+      "capabilities": [
+        "code-edit"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Node.js"
+      },
+      "risks": [
+        "Not open source."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded."
+      },
+      "evidence": [
+        {
+          "claim": "LICENSE.md: © Anthropic PBC; Commercial Terms of Service",
+          "url": "https://github.com/anthropics/claude-code"
+        }
+      ]
+    },
+    {
+      "id": "autogen",
+      "name": "AutoGen",
+      "repo": "microsoft/autogen",
+      "category": "multi-agent-framework",
+      "status": "excluded",
+      "exclusionReason": "GitHub reports CC-BY-4.0 (a content license). The software license was not verified, so it stays out of the team until verified.",
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "osi": false,
+        "note": "Needs manual code-license verification."
+      },
+      "maintenance": {
+        "archived": false,
+        "pushedAt": "2026-04-15",
+        "latestRelease": "python-v0.7.5",
+        "latestReleaseAt": "2025-09-30",
+        "openIssues": 1100
+      },
+      "freeUse": {
+        "classes": [],
+        "note": "Unverified."
+      },
+      "interfaces": [
+        "library"
+      ],
+      "integration": {
+        "verification": "not-verified",
+        "verified": "Repository metadata only.",
+        "invocation": "not applicable"
+      },
+      "capabilities": [
+        "agent-framework"
+      ],
+      "roles": [],
+      "requirements": {
+        "docker": false,
+        "gpu": false,
+        "runtime": "Python"
+      },
+      "risks": [
+        "License ambiguity."
+      ],
+      "adapter": {
+        "status": "none",
+        "note": "Excluded until license verified."
+      },
+      "evidence": [
+        {
+          "claim": "GitHub license field: CC-BY-4.0",
+          "url": "https://github.com/microsoft/autogen"
+        }
+      ]
+    }
+  ]
+}
